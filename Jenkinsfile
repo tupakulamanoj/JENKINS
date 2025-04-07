@@ -3,53 +3,70 @@ pipeline {
 
     stages {
         stage('Deploy to Slave 1') {
-            agent { label 'slave1' }
+            agent { label 'slave1' }  // Changed to your label
             steps {
-                sh '''
-                    echo "Deploying on Slave 1 machine..."
-                    # Ensure /var/www/html exists
+                checkout scm
+                withEnv(["PATH+EXTRA=/usr/sbin:/sbin"]) {
+                    sh '''
+                    echo 'Deploying on Slave 1 machine...'
+
+                    # Create directory if it doesn't exist
                     sudo mkdir -p /var/www/html
-                    # Copy files safely
-                    sudo cp -r * /var/www/html/
-                    # Restart web server
-                    if systemctl list-units --type=service | grep -q httpd; then
-                        sudo systemctl restart httpd
-                    elif systemctl list-units --type=service | grep -q apache2; then
-                        sudo systemctl restart apache2
+
+                    # Check if httpd or apache2 is installed
+                    if ! systemctl list-units --type=service | grep -q -e httpd -e apache2; then
+                      echo "Web server not found! Installing httpd..."
+                      sudo yum install -y httpd || sudo apt-get install -y apache2
+                      sudo systemctl start httpd || sudo systemctl start apache2
+                      sudo systemctl enable httpd || sudo systemctl enable apache2
                     else
-                        echo "Web server not found!"
-                        exit 1
+                      echo "Web server already installed."
                     fi
-                '''
+
+                    # Copy files to web server root
+                    sudo cp -r index.html Jenkinsfile t.txt /var/www/html/
+                    '''
+                }
             }
         }
 
         stage('Deploy to Slave 2') {
-            agent { label 'slave2' }
+            when {
+                expression { currentBuild.currentResult == 'SUCCESS' }
+            }
+            agent { label 'Slave2' }  // Changed to your label
             steps {
-                sh '''
-                    echo "Deploying on Slave 2 machine..."
+                withEnv(["PATH+EXTRA=/usr/sbin:/sbin"]) {
+                    sh '''
+                    echo 'Deploying on Slave 2 machine...'
+
+                    # Create directory if it doesn't exist
                     sudo mkdir -p /var/www/html
-                    sudo cp -r * /var/www/html/
-                    if systemctl list-units --type=service | grep -q httpd; then
-                        sudo systemctl restart httpd
-                    elif systemctl list-units --type=service | grep -q apache2; then
-                        sudo systemctl restart apache2
+
+                    # Check if httpd or apache2 is installed
+                    if ! systemctl list-units --type=service | grep -q -e httpd -e apache2; then
+                      echo "Web server not found! Installing httpd..."
+                      sudo yum install -y httpd || sudo apt-get install -y apache2
+                      sudo systemctl start httpd || sudo systemctl start apache2
+                      sudo systemctl enable httpd || sudo systemctl enable apache2
                     else
-                        echo "Web server not found!"
-                        exit 1
+                      echo "Web server already installed."
                     fi
-                '''
+
+                    # Copy files to web server root
+                    sudo cp -r index.html Jenkinsfile t.txt /var/www/html/
+                    '''
+                }
             }
         }
     }
 
     post {
         success {
-            echo "✅ Deployment successful!"
+            echo '✅ Deployment succeeded!'
         }
         failure {
-            echo "❌ Deployment failed!"
+            echo '❌ Deployment failed!'
         }
     }
 }
