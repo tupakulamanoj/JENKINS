@@ -3,7 +3,7 @@ pipeline {
 
     stages {
         stage('Deploy to Slave 1') {
-            agent { label 'slave1' }  // Changed to your label
+            agent { label 'slave1' }
             steps {
                 checkout scm
                 withEnv(["PATH+EXTRA=/usr/sbin:/sbin"]) {
@@ -23,8 +23,8 @@ pipeline {
                       echo "Web server already installed."
                     fi
 
-                    # Copy files to web server root
-                    sudo cp -r index.html Jenkinsfile t.txt /var/www/html/
+                    # Copy all files from workspace to /var/www/html
+                    sudo cp -r . /var/www/html/
                     '''
                 }
             }
@@ -34,7 +34,7 @@ pipeline {
             when {
                 expression { currentBuild.currentResult == 'SUCCESS' }
             }
-            agent { label 'Slave2' }  // Changed to your label
+            agent { label 'Slave2' }
             steps {
                 withEnv(["PATH+EXTRA=/usr/sbin:/sbin"]) {
                     sh '''
@@ -53,8 +53,8 @@ pipeline {
                       echo "Web server already installed."
                     fi
 
-                    # Copy files to web server root
-                    sudo cp -r index.html Jenkinsfile t.txt /var/www/html/
+                    # Copy all files from workspace to /var/www/html
+                    sudo cp -r . /var/www/html/
                     '''
                 }
             }
