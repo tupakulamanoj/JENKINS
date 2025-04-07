@@ -7,8 +7,19 @@ pipeline {
             steps {
                 sh '''
                     echo "Deploying on Slave 1 machine..."
+                    # Ensure /var/www/html exists
+                    sudo mkdir -p /var/www/html
+                    # Copy files safely
                     sudo cp -r * /var/www/html/
-                    sudo systemctl restart httpd || sudo systemctl restart apache2
+                    # Restart web server
+                    if systemctl list-units --type=service | grep -q httpd; then
+                        sudo systemctl restart httpd
+                    elif systemctl list-units --type=service | grep -q apache2; then
+                        sudo systemctl restart apache2
+                    else
+                        echo "Web server not found!"
+                        exit 1
+                    fi
                 '''
             }
         }
@@ -18,8 +29,16 @@ pipeline {
             steps {
                 sh '''
                     echo "Deploying on Slave 2 machine..."
+                    sudo mkdir -p /var/www/html
                     sudo cp -r * /var/www/html/
-                    sudo systemctl restart httpd || sudo systemctl restart apache2
+                    if systemctl list-units --type=service | grep -q httpd; then
+                        sudo systemctl restart httpd
+                    elif systemctl list-units --type=service | grep -q apache2; then
+                        sudo systemctl restart apache2
+                    else
+                        echo "Web server not found!"
+                        exit 1
+                    fi
                 '''
             }
         }
