@@ -3,6 +3,10 @@ pipeline {
 
     environment {
         DEPLOY_DIR = "/var/www/html"
+        SERVER_USER = "ec2-user"
+        REMOTE_DIR = "/home/ec2-user"
+        NODE1_PUBLIC_IP = "98.81.79.144"
+        NODE2_PUBLIC_IP = "98.84.116.212"
     }
 
     stages {
@@ -12,13 +16,33 @@ pipeline {
             }
         }
 
-        stage('Deploy to Apache') {
+        stage('Deploy to Slave 1') {
             steps {
-                sshagent (credentials: ['e3d7b74b-d50e-42cd-aa18-7b7b49d6f428']) {
+                sshagent (credentials: ['0ed1c13e-b8c6-4d4c-9995-2c0122dd178a']) {
                     sh '''
-                        echo "Deploying files to Apache directory..."
-                        sudo cp -r * ${DEPLOY_DIR}
-                        sudo systemctl restart httpd || sudo systemctl restart apache2
+                        echo "Deploying to Slave 1 (98.81.79.144)..."
+                        scp -o StrictHostKeyChecking=no -r * ${SERVER_USER}@${NODE1_PUBLIC_IP}:${REMOTE_DIR}/
+
+                        ssh -o StrictHostKeyChecking=no ${SERVER_USER}@${NODE1_PUBLIC_IP} '
+                            sudo cp -r ${REMOTE_DIR}/* ${DEPLOY_DIR} &&
+                            sudo systemctl restart httpd || sudo systemctl restart apache2
+                        '
+                    '''
+                }
+            }
+        }
+
+        stage('Deploy to Slave 2') {
+            steps {
+                sshagent (credentials: ['0ed1c13e-b8c6-4d4c-9995-2c0122dd178a']) {
+                    sh '''
+                        echo "Deploying to Slave 2 (98.84.116.212)..."
+                        scp -o StrictHostKeyChecking=no -r * ${SERVER_USER}@${NODE2_PUBLIC_IP}:${REMOTE_DIR}/
+
+                        ssh -o StrictHostKeyChecking=no ${SERVER_USER}@${NODE2_PUBLIC_IP} '
+                            sudo cp -r ${REMOTE_DIR}/* ${DEPLOY_DIR} &&
+                            sudo systemctl restart httpd || sudo systemctl restart apache2
+                        '
                     '''
                 }
             }
@@ -27,10 +51,10 @@ pipeline {
 
     post {
         success {
-            echo "✅ Deployment successful!"
+            echo "✅ Deployment successful on both slaves!"
         }
         failure {
-            echo "❌ Deployment failed!"
+            echo "❌ Deployment failed on one or both slaves!"
         }
     }
 }
