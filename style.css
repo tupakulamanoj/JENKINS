@@ -1,0 +1,209 @@
+*{
+    margin: 0;
+    padding: 0;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    box-sizing: border-box;
+    
+   
+    
+   
+    
+    
+}
+@keyframes gradientAnimation {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+body{
+    background-color: #2b1d0f;
+    color:#fff;
+    height: 100vh;
+    background: linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(169,169,201,1) 35%, rgba(0,212,255,1) 100%);
+    background-size: 300% 300%;
+    animation: gradientAnimation 6s ease infinite;
+    
+}
+header nav {
+   
+    
+    background: linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(169,169,201,1) 35%, rgba(0,212,255,1) 100%);
+    background-size: 300% 300%;
+    animation: gradientAnimation 6s ease infinite;
+    
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 1;
+
+}
+header nav h1 {
+    letter-spacing: 1px;
+    font-weight: 800;
+}
+header nav form{
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+    
+}
+input{
+    flex-grow: 1;
+    margin-right: 20px;
+}
+input[type="text"],button[type='submit']{
+    border: none;
+    font-size: 18px;
+    padding: 10px;
+    border-radius: 4px;
+}
+.recipe-close-btn:hover,.recipe button:hover,[type='submit']:hover{
+    background-color: rgb(148, 191, 48);
+    cursor: pointer;
+
+
+}
+.recipe-generator{
+    text-align: center;
+    
+    display: grid;
+    grid-template-columns: repeat(auto-fit,minmax(300px,1fr));
+    grid-gap: 40px;
+    width:80%;
+    margin:10px auto;
+    place-items: center;
+    
+
+}   
+.recipe{
+    background-color: #fff;
+    display: flex;
+    flex-direction: column;
+    color:black;
+    border: radius 6px;
+    box-shadow: 0 5px 10px rgba(78,73,73,0.1), -5px -5px 10px rgba(34,34,34,0.5);
+    cursor: pointer;
+    max-width:300px;
+    transition: transform 0.3s ease-in-out;
+
+}
+.recipe:hover{
+    transform: scale(1.02);
+}
+.recipe img{
+    height: 300px;
+}
+.recipe button{
+    font-size:20px;
+    padding:10px;
+    border-radius: 5px;
+    cursor:pointer;
+    margin:18px auto;
+    border:none;
+    background-color: #f44336;
+    color: #fff;
+
+}
+
+header nav{
+    flex-direction: column;
+}
+.recipe h3{
+    font-size: 24px;
+    margin-block:5px; 
+}
+.recipe p{
+    font-size: 20px;
+    color:#4a4a4a;
+    margin: 5px 0;
+}
+.recipe-details{
+    display:none;
+    position: fixed;
+    top:50%;
+    left:50%;
+    transform: translate(-50%,-50%);
+    -webkit-transform: translate(-50%,-50%);
+    background-color: #694c2f;
+    border-radius: 12px;
+    width:40%;
+    height:60%;
+    font-size:20px;
+    transition: all 0.5s ease-in-out;
+    overflow-y: scroll;
+}
+.recipe-details::-webkit-scrollbar{
+    width: 10px;
+}
+.recipe-details::-webkit-scrollbar-thumb{
+    background: #b5b5ba;
+    border-radius: 16px;
+    --webkit-border-radius:16px;
+}
+.recipe-details-content{
+    padding: 30px;
+}
+.recipename{
+    text-align: center;
+    text-transform: uppercase;
+    text-decoration: underline;
+    
+}
+.recipename,.ingredientList,.recipeinstructions{
+    margin-bottom: 20px;
+}
+.ingredientList{
+    margin-top: 10px;
+    margin-left: 20px;
+
+}
+
+.recipeinstructions{
+    line-height: 30px;
+    white-space: pre-line;
+}
+.recipe-close-btn{
+    border:none;
+    font-size: 18px;
+    padding:8px;
+    border-radius: 4px;
+    background-color: #f44336;
+    color: #fff;
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.recipe_image{
+    display: flex;
+    
+    justify-content: center;
+    align-items: center;
+    background: rgb(130, 163, 217); 
+    padding: 15px; 
+    border-radius: 12px; 
+    box-shadow: 10px 10px 20px rgba(0, 0, 0, 0.4), 
+                -5px -5px 15px rgba(255, 255, 255, 0.2); 
+    max-width: 420px; 
+    margin: auto; 
+    transform: perspective(1000px) rotateX(5deg) rotateY(-5deg); 
+    transition: all 0.3s ease-in-out;
+    cursor:pointer ;
+}
+.recipe_image:hover {
+    cursor: pointer;
+    transform: perspective(1000px) rotateX(0deg) rotateY(0deg) scale(1.05); /* Lifts on hover */
+    box-shadow: 15px 15px 30px rgba(0, 0, 0, 0.5), 
+                -7px -7px 20px rgba(255, 255, 255, 0.3);
+}
